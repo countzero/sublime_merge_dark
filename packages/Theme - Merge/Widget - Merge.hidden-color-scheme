@@ -1,0 +1,14 @@
+{
+	"name": "Sublime Merge Widgets",
+	"globals":
+	{
+		"foreground": "hsl(60, 25%, 98%)",
+		"background": "hsl(285, 5%, 17%)",
+		"caret": "hsl(60, 25%, 98%)",
+		"line_highlight": "hsl(280, 2%, 25%)",
+		"selection": "hsl(280, 2%, 25%)",
+		"selection_border": "hsl(300, 1%, 44%)",
+		"inactive_selection": "hsl(280, 2%, 25%)"
+	},
+	"rules": []
+}
