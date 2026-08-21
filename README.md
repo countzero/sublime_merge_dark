@@ -126,6 +126,7 @@ install-monokai-merge.sh      Linux installer
 tools/test-linux.sh           functional test for the bash installer
 tools/probe-control-tree.ps1  control-tree reader, for diagnosing new surfaces
 AGENTS.md                     findings, method, and rules for changes
+.claude/skills/               agent skills: plan review, PR review
 ```
 
 ## Maintenance

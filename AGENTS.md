@@ -19,6 +19,7 @@ install-monokai-merge.ps1     Windows installer (verified end-to-end on real Mer
 install-monokai-merge.sh      Linux installer   (verified against a synthetic install)
 tools/test-linux.sh           functional test for the bash installer
 tools/probe-control-tree.ps1  ctrl+alt+click control-tree reader (see Diagnosis below)
+.claude/skills/               plan-review, pr-code-review (see Skills below)
 ```
 
 ## The Licence Gate, and the Mechanism That Bypasses It
@@ -223,6 +224,50 @@ Linux paths, in probe order. Data dir: `$XDG_CONFIG_HOME/sublime-merge`, then
 `~/.config/sublime_merge`, then the Flatpak location. Install dir:
 `/opt/sublime_merge`, `/usr/lib/sublime-merge`, `/usr/share/sublime-merge`, then
 Flatpak. Both are overridable with `--data-dir` / `--merge-dir`.
+
+## Scratch Files
+
+Ad-hoc agent artefacts (screenshots, pixel measurements, control-tree captures,
+scratch scripts, diffs) go under `.tmp/sessions/<session-id>/`. `.tmp/` is
+gitignored. Never write scratch files to `.claude/`, the repository root, or
+`tools/`. `tools/probe-control-tree.ps1` takes `-OutputDir` for exactly this
+reason: point it at your session directory rather than letting captures land
+next to the script.
+
+## Multi-Agent Working Tree Discipline
+
+Multiple agents may share this directory; foreign uncommitted changes and
+untracked files are untouchable.
+
+1. **Foreign changes off-limits.** Never run `git checkout --`, `restore --`,
+   `reset --hard`, `clean`, `rm`, `mv`, or `git stash pop/apply` on a path
+   another agent modified or an untracked file another agent created. "Commit
+   and push" does NOT authorise destructive cleanup of foreign paths.
+2. **Preflight.** `git status --porcelain -u` at task start and again before
+   `git commit`. Stage with explicit pathspecs; never `git add -A`.
+3. **Session-scoped scratch.** Use `<session-id>` from your runtime's session
+   metadata if exposed; otherwise mint `YYYYMMDD-HHMMSS-<random6>`.
+4. **Stashes session-scoped.** Only with an explicit pathspec and a tagged
+   message: `git stash push --message "session-<id>: <reason>" -- <files>`.
+   Bare `git stash`, `-u`, `--all`, and pop/apply of foreign stashes are
+   forbidden.
+5. **Edit and shell writes are mutually exclusive per file.** If a file was
+   written outside the Edit tool, the cached content is stale. Re-Read before
+   the next Edit. If Edit fails with "oldString not found", assume a concurrent
+   foreign write: surface it to the user, do not guess.
+
+When your changes overlap foreign WIP in the same file, stop and ask. Do not
+reset, restore, or stash.
+
+## Skills
+
+Under `.claude/skills/`, loaded on demand:
+
+- `plan-review`: second-pass design review before presenting a non-trivial
+  plan. Ten lenses; emits a tail marker only when the pass changed something.
+- `pr-code-review`: three-pass defect review of a diff, severity-filtered, with
+  deep links. Advisory only; it never writes to GitHub. Its project-specific
+  checklist is the enforcement arm of *Rules for Changes* below.
 
 ## Rules for Changes
 
