@@ -2,9 +2,16 @@
 # Functional test of install-monokai-merge.sh against a synthetic Linux install.
 set -uo pipefail
 
-SRC=/mnt/d/Arbeit/fertilizer_management/.tmp/sessions/ses_fdf265fcdffe3REn7y1iMIYwhM
-WINPKG='/mnt/c/Program Files/Sublime Merge/Packages/Theme - Merge.sublime-package'
-WINCLONE='/mnt/c/Users/Finn Kumkar/AppData/Roaming/Sublime Merge/Packages/Monokai Theme'
+# Repository root, derived from this script's own location so the test always exercises
+# the installer sitting next to it rather than a copy somewhere else.
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# A real Sublime Merge installation is needed for the .sublime-package and, optionally, an
+# existing upstream clone to avoid hitting the network. Override either for your own host.
+: "${SM_PACKAGE:=/mnt/c/Program Files/Sublime Merge/Packages/Theme - Merge.sublime-package}"
+: "${SM_CLONE:=$HOME/.config/sublime-merge/Packages/Monokai Theme}"
+WINPKG="$SM_PACKAGE"
+WINCLONE="$SM_CLONE"
 ROOT=/tmp/smtest
 
 echo '=== 1. syntax check ==='
@@ -25,8 +32,12 @@ echo '=== 3. build a synthetic install ==='
 rm -rf "$ROOT"
 mkdir -p "$ROOT/opt/sublime_merge/Packages" "$ROOT/home/.config/sublime-merge/Packages"
 cp "$WINPKG" "$ROOT/opt/sublime_merge/Packages/" || { echo '  could not copy the package'; exit 1; }
-# pre-seed the upstream clone so the test needs no network
-cp -r "$WINCLONE" "$ROOT/home/.config/sublime-merge/Packages/Monokai Theme"
+# pre-seed the upstream clone when one is available, so the test needs no network
+if [ -d "$WINCLONE/common" ]; then
+    cp -r "$WINCLONE" "$ROOT/home/.config/sublime-merge/Packages/Monokai Theme"
+else
+    echo "  no local clone at '$WINCLONE'; the installer will clone (needs network)"
+fi
 echo "  package: $(du -h "$ROOT/opt/sublime_merge/Packages/Theme - Merge.sublime-package" | cut -f1)"
 echo "  clone pre-seeded: $([ -d "$ROOT/home/.config/sublime-merge/Packages/Monokai Theme/common" ] && echo yes || echo no)"
 
@@ -65,7 +76,8 @@ grep -m4 -E '"(background|foreground)"' \
 
 echo
 echo '=== 9. compare against the Windows-verified output ==='
-WINOUT='/mnt/c/Users/Finn Kumkar/AppData/Roaming/Sublime Merge/Packages'
+: "${SM_WINOUT:=}"
+WINOUT="$SM_WINOUT"
 for f in 'Theme - Merge/Merge Base.sublime-theme' 'Theme - Merge/Merge Dark Base.sublime-theme'; do
     a="$WINOUT/$f"; b="$ROOT/home/.config/sublime-merge/Packages/$f"
     if [ -f "$a" ] && [ -f "$b" ]; then

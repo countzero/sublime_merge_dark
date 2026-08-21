@@ -11,13 +11,12 @@ the surfaces that ordinary theme rules cannot reach. Developed against
 **Sublime Merge build 2125, unregistered, Windows**; the Linux installer was
 developed and tested against a synthetic install in a Debian WSL guest.
 
-There is no application code here. The deliverable is two installers plus a
-verified snapshot of their output.
+There is no application code here. The deliverable is the two installers. They
+generate every theme resource on the target machine, and redistribute none.
 
 ```
 install-monokai-merge.ps1     Windows installer (verified end-to-end on real Merge)
 install-monokai-merge.sh      Linux installer   (verified against a synthetic install)
-packages/                     snapshot of the verified output, build 2125
 tools/test-linux.sh           functional test for the bash installer
 tools/probe-control-tree.ps1  ctrl+alt+click control-tree reader (see Diagnosis below)
 ```
@@ -239,10 +238,11 @@ Flatpak. Both are overridable with `--data-dir` / `--merge-dir`.
    were void for want of this.
 4. **Never edit the `Monokai Theme` clone** on a target machine; it is a
    pristine upstream checkout and the installers read from it.
-5. **`packages/` is build-2125-specific.** `Merge Base.sublime-theme` and
-   `Merge Dark Base.sublime-theme` are extracts of shipped files. Prefer the
-   installers, which re-derive them from whatever version is installed. Re-run
-   after any Sublime Merge upgrade.
+5. **Never commit generated theme resources.** `Merge Base.sublime-theme` is a
+   verbatim copy of Sublime HQ's shipped theme; the installers extract it from
+   the user's own installation at run time, which is why this repository
+   redistributes nothing. Re-run an installer after any Sublime Merge upgrade,
+   since that copy is version-specific.
 6. Keep the installers idempotent, and keep `--uninstall` in step with whatever
    files they create.
 7. Run `tools/test-linux.sh` after touching the bash installer. It needs a

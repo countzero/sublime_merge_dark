@@ -23,16 +23,12 @@
 .PARAMETER MergeProgramDir
     Sublime Merge install directory. Defaults to the standard location.
 
-.PARAMETER Variant
-    Which Monokai Pro filter to use, e.g. 'Monokai Plus', 'Monokai Plus (Octagon)'.
-
 .PARAMETER Uninstall
     Removes every file this script creates, restoring the stock appearance.
 #>
 [CmdletBinding()]
 param(
     [string]$MergeProgramDir = "$env:ProgramFiles\Sublime Merge",
-    [string]$Variant = 'Monokai Plus',
     [switch]$Uninstall
 )
 
@@ -43,7 +39,7 @@ $packages = Join-Path $env:APPDATA 'Sublime Merge\Packages'
 $themeDir = Join-Path $packages 'Theme - Merge'
 $userDir  = Join-Path $packages 'User'
 $cloneDir = Join-Path $packages 'Monokai Theme'
-$schemeName = "$Variant Merge.sublime-color-scheme"
+$schemeName = 'Monokai Plus Merge.sublime-color-scheme'
 
 function Write-Step { param([string]$Message) Write-Host "  $Message" -ForegroundColor Cyan }
 
@@ -84,10 +80,10 @@ if (-not (Test-Path -LiteralPath (Join-Path $cloneDir 'common'))) {
 } else {
     Write-Step 'upstream Monokai clone already present'
 }
-$upstreamTheme  = Join-Path $cloneDir "common\$Variant.hidden-theme"
-$upstreamScheme = Join-Path $cloneDir "Plus - Monokai\$Variant.sublime-color-scheme"
+$upstreamTheme  = Join-Path $cloneDir 'common\Monokai Plus.hidden-theme'
+$upstreamScheme = Join-Path $cloneDir 'Plus - Monokai\Monokai Plus.sublime-color-scheme'
 foreach ($f in @($upstreamTheme, $upstreamScheme)) {
-    if (-not (Test-Path -LiteralPath $f)) { throw "Upstream file missing: $f (check -Variant)" }
+    if (-not (Test-Path -LiteralPath $f)) { throw "Upstream file missing: $f. Delete '$cloneDir' and re-run to re-clone." }
 }
 
 # --------------------- 2. extract the shipped themes under non-clashing names
@@ -132,7 +128,7 @@ $globalsBlock = $schemeText.Substring($gi, $ri - $gi)
 $newGlobals = [regex]::Replace($globalsBlock, '("([A-Za-z0-9_]+)"\s*:\s*")([^"]+)(")', {
     param($m) $m.Groups[1].Value + (Resolve-SchemeVar $m.Groups[3].Value) + $m.Groups[4].Value })
 $scheme = $schemeText.Substring(0, $gi) + $newGlobals + $schemeText.Substring($ri)
-$scheme = $scheme -replace '"name"\s*:\s*"[^"]*"', "`"name`": `"$Variant Merge`""
+$scheme = $scheme -replace '"name"\s*:\s*"[^"]*"', "`"name`": `"Monokai Plus Merge`""
 [System.IO.File]::WriteAllText((Join-Path $userDir $schemeName), $scheme)
 
 $background = Resolve-SchemeVar 'var(background)'
@@ -209,17 +205,18 @@ foreach ($n in @('Commit Message - Merge', 'Commit Message (Read Only) - Merge')
 Write-Step "bound $($plain.Count + 3) view types to the scheme"
 
 # ---------------------------------------------- 6. global colour scheme preference
+# An existing Preferences file is never rewritten. The per-view-type bindings above are
+# what actually carry the theme (verified by measurement: identical pixel counts with and
+# without this key), so a hands-off policy costs nothing here and cannot damage settings
+# that legitimately contain comments and trailing commas.
 $prefsPath = Join-Path $userDir 'Preferences.sublime-settings'
-$prefs = @{}
 if (Test-Path -LiteralPath $prefsPath) {
-    $raw = (Get-Content -LiteralPath $prefsPath -Raw) -replace '(?m)//.*$', ''
-    if ($raw.Trim()) {
-        try { ((ConvertFrom-Json $raw).PSObject.Properties) | ForEach-Object { $prefs[$_.Name] = $_.Value } } catch { }
-    }
+    Write-Step 'Preferences.sublime-settings already exists: left untouched'
+    Write-Host "      optional, to set the global default too, add: `"color_scheme`": `"$schemeName`"" -ForegroundColor DarkGray
+} else {
+    "{`n`t`"color_scheme`": `"$schemeName`"`n}" | Set-Content -LiteralPath $prefsPath -Encoding UTF8
+    Write-Step 'created Preferences.sublime-settings'
 }
-$prefs['color_scheme'] = $schemeName
-($prefs | ConvertTo-Json) | Set-Content -LiteralPath $prefsPath -Encoding UTF8
-Write-Step 'set the global color_scheme preference'
 
 Write-Host ''
 Write-Host 'Done. Restart Sublime Merge.' -ForegroundColor Green

@@ -41,18 +41,14 @@ Then **restart Sublime Merge**.
 
 Both installers take the same options.
 
-| Option                  | Meaning                                              |
-| ----------------------- | ---------------------------------------------------- |
-| `-Variant` / `--variant` | Monokai filter, e.g. `"Monokai Plus (Octagon)"`      |
-| `--merge-dir`            | Sublime Merge install dir, if auto-detection fails    |
-| `--data-dir`             | Sublime Merge data dir, if auto-detection fails       |
-| `-Uninstall` / `--uninstall` | Remove every file the installer created           |
+| Option                       | Meaning                                            |
+| ---------------------------- | -------------------------------------------------- |
+| `--merge-dir`                | Sublime Merge install dir, if auto-detection fails |
+| `--data-dir`                 | Sublime Merge data dir, if auto-detection fails    |
+| `-Uninstall` / `--uninstall` | Remove every file the installer created            |
 
 On Windows the install dir option is `-MergeProgramDir`; the data dir is always
 `%AppData%\Sublime Merge`.
-
-Available variants: `Monokai Plus`, and the `(Octagon)`, `(Machine)`,
-`(Ristretto)`, `(Spectrum)`, `(Classic)`, `(Dawn)` filters that upstream ships.
 
 ### Requirements
 
@@ -87,7 +83,7 @@ Packages/Theme - Merge/
     Widget - Merge.hidden-color-scheme
     Widget - Merge.sublime-settings
 Packages/User/
-    <Variant> Merge.sublime-color-scheme    the scheme, with literal globals
+    Monokai Plus Merge.sublime-color-scheme  the scheme, with literal globals
     Diff.sublime-settings
     Diff - Merge.sublime-settings
     File Mode - Merge.sublime-settings
@@ -127,16 +123,10 @@ Full reasoning, the measurements behind it, and the dead ends are in
 ```
 install-monokai-merge.ps1     Windows installer
 install-monokai-merge.sh      Linux installer
-packages/                     snapshot of the verified output (build 2125)
 tools/test-linux.sh           functional test for the bash installer
 tools/probe-control-tree.ps1  control-tree reader, for diagnosing new surfaces
 AGENTS.md                     findings, method, and rules for changes
 ```
-
-`packages/` is a convenience snapshot: unpack it over your data dir's
-`Packages/` to skip the installer. Prefer the installers, because two of those
-files are extracted from **build 2125's** shipped package and would be stale on
-a different version.
 
 ## Maintenance
 
@@ -164,3 +154,18 @@ Linux.
 
 Theme: [bitsper2nd/merge-monokai-theme](https://github.com/bitsper2nd/merge-monokai-theme).
 The `log_control_tree` tip comes from a Sublime staff reply on forum topic 55800.
+
+## Licence
+
+[MIT](LICENSE), covering the installers, the tools and the documentation in this
+repository.
+
+Two things this repository deliberately does **not** contain:
+
+- The Monokai theme itself. The installers clone
+  [bitsper2nd/merge-monokai-theme](https://github.com/bitsper2nd/merge-monokai-theme)
+  (MIT) and derive the colour scheme from it at install time.
+- Any file shipped by Sublime HQ. `Merge Base.sublime-theme` and
+  `Merge Dark Base.sublime-theme` are extracted from *your own* Sublime Merge
+  installation when you run an installer. Nothing belonging to Sublime HQ is
+  redistributed here.

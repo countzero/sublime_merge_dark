@@ -23,7 +23,6 @@
 
 set -euo pipefail
 
-VARIANT="Monokai Plus"
 MERGE_DIR=""
 DATA_DIR=""
 UNINSTALL=0
@@ -33,8 +32,6 @@ usage() {
     cat <<'EOF'
 Usage: install-monokai-merge.sh [options]
 
-  --variant NAME     Monokai filter to use (default: "Monokai Plus").
-                     e.g. "Monokai Plus (Octagon)", "Monokai Plus (Machine)"
   --merge-dir PATH   Sublime Merge install dir (contains Packages/Theme - Merge.sublime-package)
   --data-dir PATH    Sublime Merge data dir   (contains Packages/)
   --uninstall        Remove every file this script creates
@@ -44,7 +41,6 @@ EOF
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --variant)   VARIANT="${2:?--variant needs a value}"; shift 2 ;;
         --merge-dir) MERGE_DIR="${2:?--merge-dir needs a value}"; shift 2 ;;
         --data-dir)  DATA_DIR="${2:?--data-dir needs a value}"; shift 2 ;;
         --uninstall) UNINSTALL=1; shift ;;
@@ -86,7 +82,7 @@ PACKAGES="$DATA_DIR/Packages"
 THEME_DIR="$PACKAGES/Theme - Merge"
 USER_DIR="$PACKAGES/User"
 CLONE_DIR="$PACKAGES/Monokai Theme"
-SCHEME_NAME="$VARIANT Merge.sublime-color-scheme"
+SCHEME_NAME="Monokai Plus Merge.sublime-color-scheme"
 
 # ---------------------------------------------------------------- uninstall
 if [ "$UNINSTALL" -eq 1 ]; then
@@ -137,10 +133,12 @@ else
     step "cloning $UPSTREAM_URL"
     git clone --quiet --depth 1 "$UPSTREAM_URL" "$CLONE_DIR"
 fi
-UPSTREAM_THEME="$CLONE_DIR/common/$VARIANT.hidden-theme"
-UPSTREAM_SCHEME="$CLONE_DIR/Plus - Monokai/$VARIANT.sublime-color-scheme"
-[ -f "$UPSTREAM_THEME" ]  || die "upstream theme missing: $UPSTREAM_THEME (check --variant)"
-[ -f "$UPSTREAM_SCHEME" ] || die "upstream scheme missing: $UPSTREAM_SCHEME (check --variant)"
+UPSTREAM_THEME="$CLONE_DIR/common/Monokai Plus.hidden-theme"
+UPSTREAM_SCHEME="$CLONE_DIR/Plus - Monokai/Monokai Plus.sublime-color-scheme"
+[ -f "$UPSTREAM_THEME" ]  || die "upstream theme missing: $UPSTREAM_THEME
+       Delete '$CLONE_DIR' and re-run to re-clone."
+[ -f "$UPSTREAM_SCHEME" ] || die "upstream scheme missing: $UPSTREAM_SCHEME
+       Delete '$CLONE_DIR' and re-run to re-clone."
 
 # --------------------- 2. extract the shipped themes under non-clashing names
 # The shipped LIGHT theme (Merge.sublime-theme) is the root of the inheritance chain.
@@ -203,7 +201,7 @@ END {
 }
 '
 awk -v MODE=scheme "$RESOLVER" "$UPSTREAM_SCHEME" \
-    | sed "0,/\"name\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/s//\"name\": \"$VARIANT Merge\"/" \
+    | sed "0,/\"name\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/s//\"name\": \"Monokai Plus Merge\"/" \
     > "$USER_DIR/$SCHEME_NAME"
 [ -s "$USER_DIR/$SCHEME_NAME" ] || die "failed to generate the colour scheme"
 
@@ -298,19 +296,17 @@ done
 step "bound 6 view types plus the widget palette"
 
 # ---------------------------------------------- 6. global colour scheme preference
+# An existing Preferences file is never rewritten. The per-view-type bindings above are
+# what actually carry the theme (verified by measurement: identical pixel counts with and
+# without this key), so a hands-off policy costs nothing here and cannot damage settings
+# that legitimately contain comments and trailing commas.
 PREFS="$USER_DIR/Preferences.sublime-settings"
-if [ ! -f "$PREFS" ]; then
+if [ -f "$PREFS" ]; then
+    step "Preferences.sublime-settings already exists: left untouched"
+    printf '      optional, to set the global default too, add: "color_scheme": "%s"\n' "$SCHEME_NAME"
+else
     printf '{\n\t"color_scheme": "%s"\n}\n' "$SCHEME_NAME" > "$PREFS"
     step "created Preferences.sublime-settings"
-elif grep -q '"color_scheme"' "$PREFS"; then
-    cp -- "$PREFS" "$PREFS.bak"
-    sed -i "s|\"color_scheme\"[[:space:]]*:[[:space:]]*\"[^\"]*\"|\"color_scheme\": \"$SCHEME_NAME\"|" "$PREFS"
-    step "updated color_scheme in Preferences.sublime-settings (backup: Preferences.sublime-settings.bak)"
-else
-    cp -- "$PREFS" "$PREFS.bak"
-    awk -v s="$SCHEME_NAME" 'NR==1 && /^[[:space:]]*\{/ { print; printf "\t\"color_scheme\": \"%s\",\n", s; next } { print }' \
-        "$PREFS.bak" > "$PREFS"
-    step "added color_scheme to Preferences.sublime-settings (backup: Preferences.sublime-settings.bak)"
 fi
 
 printf '\nDone. Restart Sublime Merge.\n'
