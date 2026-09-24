@@ -22,9 +22,9 @@ tools/probe-control-tree.ps1  ctrl+alt+click control-tree reader (see Diagnosis 
 .claude/skills/               plan-review, pr-code-review (see Skills below)
 ```
 
-## The Licence Gate, and the Mechanism That Bypasses It
+## The License Gate, and the Mechanism That Bypasses It
 
-Sublime Merge gates theme *selection* behind a licence. Two facts, both
+Sublime Merge gates theme *selection* behind a license. Two facts, both
 verified empirically rather than inferred:
 
 - Setting `"theme": "Merge Dark.sublime-theme"` in `Preferences.sublime-settings`
@@ -39,8 +39,8 @@ shipped `.sublime-package` archives. That is the entire basis of this project.
 Verified live: adding a rule to the extracted root theme repainted the sidebar
 (140,896 px).
 
-**Do not** attempt to work around the licence any other way. No binary
-patching, no key generation, no licence-file synthesis. Documented
+**Do not** attempt to work around the license any other way. No binary
+patching, no key generation, no license-file synthesis. Documented
 configuration mechanisms only.
 
 ## Theme Structure
@@ -84,9 +84,9 @@ in, not the file at the end of the `extends` chain. Overriding
 `detail_panel_bg` in the child had no effect on a rule defined in the root.
 Do not assume child variables leak upward.
 
-### 2. Colour scheme globals must be LITERAL
+### 2. Color scheme globals must be LITERAL
 
-Merge does not follow `var()` indirection when deriving theme colours. Upstream
+Merge does not follow `var()` indirection when deriving theme colors. Upstream
 Monokai writes `"background": "var(background)"`, which leaves the chrome
 light. Both installers therefore generate a copy of the scheme with every
 `globals` value resolved to a literal (`hsl(285, 5%, 17%)` and so on). This is
@@ -132,7 +132,7 @@ child's inset leaves a 2 px light line above and below the bar (1,636 px of
 The commit dialog pane is different: `commit_dialog_summary_container` obeys a
 direct tint, no child needed. Neither Monokai nor the light base styles it.
 
-### 4. Generalisable rule
+### 4. Generalizable rule
 
 When a surface resists every theme rule, stop attacking the parent. Read the
 control tree, find the child that covers the same rectangle, and tint that.
@@ -162,16 +162,16 @@ Use this **before** guessing at class names. Remove the setting when done.
 `tools/probe-control-tree.ps1` automates the click and console capture.
 Gotchas it already handles: the console is a **toggle** whose state persists
 across restarts; `SetForegroundWindow` is refused from a background session, so
-minimise-then-restore or `AttachThreadInput` is needed; and opening the console
+minimize-then-restore or `AttachThreadInput` is needed; and opening the console
 re-lays out the window, so capture and click must happen in one pass.
 
 ## Verification Method
 
-Never judge a colour change from a screenshot. Measure.
+Never judge a color change from a screenshot. Measure.
 
 - Capture with `PrintWindow(hwnd, hdc, 2)` (`PW_RENDERFULLCONTENT`).
   `CopyFromScreen` is unreliable because other windows overlap.
-- Count exact pixel values. The two target colours are the light toolbar
+- Count exact pixel values. The two target colors are the light toolbar
   `#C7CCD1` and the light panel `#FCFDFD`.
 - Report light coverage as the share of sampled pixels with luminance > 150.
 
@@ -195,13 +195,13 @@ Each of these cost real time and produced a confident wrong answer.
 - **`#FCFDFD` equals Breakers' background exactly** (`hsl(180, 9%, 99%)`).
   A **red herring**. Overriding `Breakers.sublime-color-scheme` works (verified:
   a view bound to it went dark) yet the panel stayed light.
-- Sweeping all 314 base classes with marker colours: the target surface is not
+- Sweeping all 314 base classes with marker colors: the target surface is not
   among them, because its value is engine-set rather than rule-set.
 - Overriding the view-type settings (`File Mode - Merge` and friends) as package
   resources: no effect on the engine-drawn surfaces.
 - `themed_title_bar: false`: keeps the light strip and adds a menu bar.
 - `Diff.sublime-settings` (un-suffixed), the file the docs name as the source of
-  theme colours: no observable effect. Both installers still write it, because
+  theme colors: no observable effect. Both installers still write it, because
   the documentation says to and it is harmless.
 - Installing the complete third-party **meetio** theme (290 styled classes
   against Monokai's 53): shows the same white surfaces. Not a Monokai gap.
@@ -211,7 +211,7 @@ Each of these cost real time and produced a confident wrong answer.
 Both caught by `tools/test-linux.sh`; both would otherwise have shipped
 silently.
 
-- **No `eval` on resolved colours.** Values like `hsl(285, 5%, 17%)` contain
+- **No `eval` on resolved colors.** Values like `hsl(285, 5%, 17%)` contain
   parentheses and spaces, which `eval` treats as shell syntax. Read them with
   `sed -n "s/^key=//p"` instead.
 - **No interval expressions in awk.** Debian's default `awk` is `mawk`, where
@@ -227,7 +227,7 @@ Flatpak. Both are overridable with `--data-dir` / `--merge-dir`.
 
 ## Scratch Files
 
-Ad-hoc agent artefacts (screenshots, pixel measurements, control-tree captures,
+Ad-hoc agent artifacts (screenshots, pixel measurements, control-tree captures,
 scratch scripts, diffs) go under `.tmp/sessions/<session-id>/`. `.tmp/` is
 gitignored. Never write scratch files to `.claude/`, the repository root, or
 `tools/`. `tools/probe-control-tree.ps1` takes `-OutputDir` for exactly this
@@ -242,7 +242,7 @@ untracked files are untouchable.
 1. **Foreign changes off-limits.** Never run `git checkout --`, `restore --`,
    `reset --hard`, `clean`, `rm`, `mv`, or `git stash pop/apply` on a path
    another agent modified or an untracked file another agent created. "Commit
-   and push" does NOT authorise destructive cleanup of foreign paths.
+   and push" does NOT authorize destructive cleanup of foreign paths.
 2. **Preflight.** `git status --porcelain -u` at task start and again before
    `git commit`. Stage with explicit pathspecs; never `git add -A`.
 3. **Session-scoped scratch.** Use `<session-id>` from your runtime's session

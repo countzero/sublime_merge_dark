@@ -4,13 +4,13 @@
     three surfaces that no theme rule reaches on its own.
 
 .DESCRIPTION
-    Sublime Merge gates the "theme" setting behind a licence, so the active theme is always
+    Sublime Merge gates the "theme" setting behind a license, so the active theme is always
     named "Merge" (which is the LIGHT theme). Loose files under
     %AppData%\Sublime Merge\Packages\<PackageName>\ replace same-named resources inside the
     shipped .sublime-package archives, and that is NOT gated. This script exploits that.
 
     Three surfaces need special handling because Sublime Merge draws their layer0 itself,
-    from the light companion colour scheme, ignoring every theme rule:
+    from the light companion color scheme, ignoring every theme rule:
         header                        -> the app bar / toolbar
         details_panel                 -> the right-hand pane behind the diffs
         commit_dialog_summary_container -> the commit dialog pane
@@ -106,10 +106,10 @@ try {
     Write-Step 'extracted Merge Base + Merge Dark Base from the installed package'
 } finally { $zip.Dispose() }
 
-# ------- 3. colour scheme with LITERAL globals (var() indirection breaks theme colours)
+# ------- 3. color scheme with LITERAL globals (var() indirection breaks theme colors)
 $schemeText = [System.IO.File]::ReadAllText($upstreamScheme)
 $vi = $schemeText.IndexOf('"variables"'); $gi = $schemeText.IndexOf('"globals"'); $ri = $schemeText.IndexOf('"rules"')
-if ($vi -lt 0 -or $gi -lt 0 -or $ri -lt 0) { throw 'Unexpected colour scheme layout.' }
+if ($vi -lt 0 -or $gi -lt 0 -or $ri -lt 0) { throw 'Unexpected color scheme layout.' }
 $vars = @{}
 foreach ($m in [regex]::Matches($schemeText.Substring($vi, $gi - $vi), '"([A-Za-z0-9_\-]+)"\s*:\s*"([^"]+)"')) {
     $vars[$m.Groups[1].Value] = $m.Groups[2].Value
@@ -150,7 +150,7 @@ while ($lines[$prev].Trim() -eq '') { $prev-- }
 if ($lines[$prev].TrimEnd() -notmatch ',$') { $lines[$prev] = $lines[$prev].TrimEnd() + ',' }
 $fixes = @(
     '        // Sublime Merge draws header.layer0 and details_panel.layer0 itself, from the light',
-    '        // companion colour scheme, ignoring every theme rule. Their linear_container_control',
+    '        // companion color scheme, ignoring every theme rule. Their linear_container_control',
     '        // child covers the same rectangle and does obey the theme.',
     ('        {{ "class": "linear_container_control", "parents": [{{"class": "details_panel"}}], "layer0.tint": "{0}", "layer0.opacity": 1.0 }},' -f $background),
     ('        {{ "class": "linear_container_control", "parents": [{{"class": "header"}}], "layer0.tint": "{0}", "layer0.opacity": 1.0 }},' -f $background),
@@ -203,7 +203,7 @@ $widget = @"
 "@ | Set-Content -LiteralPath (Join-Path $themeDir 'Widget - Merge.sublime-settings') -Encoding UTF8
 
 # every view type Merge binds by "<Type> - <ThemeName>.sublime-settings", plus the
-# un-suffixed Diff.sublime-settings the theme docs name as the source of theme colours
+# un-suffixed Diff.sublime-settings the theme docs name as the source of theme colors
 $plain = @('Diff', 'Diff - Merge', 'File Mode - Merge', 'Git Output - Merge')
 foreach ($n in $plain) {
     "{`n`t`"color_scheme`": `"$schemeName`"`n}" | Set-Content -LiteralPath (Join-Path $userDir "$n.sublime-settings") -Encoding UTF8
@@ -214,7 +214,7 @@ foreach ($n in @('Commit Message - Merge', 'Commit Message (Read Only) - Merge')
 }
 Write-Step "bound $($plain.Count + 3) view types to the scheme"
 
-# ---------------------------------------------- 6. global colour scheme preference
+# ---------------------------------------------- 6. global color scheme preference
 # An existing Preferences file is never rewritten. The per-view-type bindings above are
 # what actually carry the theme (verified by measurement: identical pixel counts with and
 # without this key), so a hands-off policy costs nothing here and cannot damage settings

@@ -70,7 +70,7 @@ $tid = [Native.Tr]::GetWindowThreadProcessId($h, [IntPtr]::Zero)
 $r = New-Object System.Drawing.Rectangle
 for ($attempt = 1; $attempt -le 6; $attempt++) {
     if ($attempt -gt 1) {
-        # minimise then restore: reliably grants foreground when SetForegroundWindow is
+        # minimize then restore: reliably grants foreground when SetForegroundWindow is
         # refused, which Windows does for a process not already in the foreground
         [Native.Tr]::ShowWindow($h, 6) | Out-Null
         Start-Sleep -Milliseconds 600

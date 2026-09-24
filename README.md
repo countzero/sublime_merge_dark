@@ -5,9 +5,9 @@
 Apply the **Monokai Pro** theme to **Sublime Merge**, including the three
 surfaces that ordinary theme rules cannot reach.
 
-Sublime Merge gates theme *selection* behind a licence, but it does **not** gate
+Sublime Merge gates theme *selection* behind a license, but it does **not** gate
 package resource overrides. This uses only documented configuration mechanisms:
-no binary patching, no licence tampering.
+no binary patching, no license tampering.
 
 ## Before and after
 
@@ -18,7 +18,7 @@ Measured, not eyeballed. Share of pixels with luminance > 150:
 | Commit dialog | ~57%        | **3.22%** |
 | Commit detail | 22.45%      | **2.46%** |
 
-Both target light colours, the toolbar `#C7CCD1` and the panel `#FCFDFD`, are
+Both target light colors, the toolbar `#C7CCD1` and the panel `#FCFDFD`, are
 reduced to **zero** pixels. What light remains is text, diff highlights, and
 badge chips.
 
@@ -98,20 +98,20 @@ Packages/Monokai Theme/                     pristine upstream clone
 
 Loose files in `Packages/<PackageName>/` replace same-named resources inside the
 shipped `.sublime-package` archives. That is what makes this work without a
-licence.
+license.
 
 ## Why it needs more than a theme file
 
 Two reasons, both non-obvious.
 
-**Colour scheme globals must be literal.** Merge does not follow `var()`
-indirection when deriving theme colours, and upstream Monokai writes
+**Color scheme globals must be literal.** Merge does not follow `var()`
+indirection when deriving theme colors, and upstream Monokai writes
 `"background": "var(background)"`. The installer generates a copy of the scheme
 with every `globals` value resolved to a literal.
 
 **Three surfaces are drawn by the engine, not the theme.** `header` (the app
 bar) and `details_panel` (the right-hand pane) have their `layer0` set by Merge
-from the *light* companion colour scheme, and they ignore every theme rule aimed
+from the *light* companion color scheme, and they ignore every theme rule aimed
 at them, including a literal in the root theme file. The fix is to tint their
 `linear_container_control` child, which covers the same rectangle and does obey
 the theme, plus zeroing the header's `content_margin` so no light line shows at
@@ -173,7 +173,7 @@ Two things this repository deliberately does **not** contain:
 
 - The Monokai theme itself. The installers clone
   [bitsper2nd/merge-monokai-theme](https://github.com/bitsper2nd/merge-monokai-theme)
-  (MIT) and derive the colour scheme from it at install time.
+  (MIT) and derive the color scheme from it at install time.
 - Any file shipped by Sublime HQ. `Merge Base.sublime-theme` and
   `Merge Dark Base.sublime-theme` are extracted from *your own* Sublime Merge
   installation when you run an installer. Nothing belonging to Sublime HQ is

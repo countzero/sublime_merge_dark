@@ -3,13 +3,13 @@
 # Applies the Monokai Pro theme to an unregistered Sublime Merge on Linux, including the
 # three surfaces that no theme rule reaches on its own.
 #
-# Sublime Merge gates the "theme" setting behind a licence, so the active theme is always
+# Sublime Merge gates the "theme" setting behind a license, so the active theme is always
 # named "Merge", which is the LIGHT theme. Loose files under
 # <data-dir>/Packages/<PackageName>/ replace same-named resources inside the shipped
 # .sublime-package archives, and that is NOT gated. This script exploits that.
 #
 # Three surfaces need special handling because Sublime Merge draws their layer0 itself,
-# from the light companion colour scheme, ignoring every theme rule:
+# from the light companion color scheme, ignoring every theme rule:
 #     header                          -> the app bar / toolbar
 #     details_panel                   -> the right-hand pane behind the diffs
 #     commit_dialog_summary_container  -> the commit dialog pane
@@ -151,8 +151,8 @@ extract "$PKG" "Merge Dark.sublime-theme" \
 [ -s "$THEME_DIR/Merge Base.sublime-theme" ] || die "failed to extract Merge.sublime-theme from the package"
 step "extracted Merge Base + Merge Dark Base from the installed package"
 
-# ------- 3. colour scheme with LITERAL globals
-# Sublime Merge does not follow var() indirection when deriving theme colours, so every
+# ------- 3. color scheme with LITERAL globals
+# Sublime Merge does not follow var() indirection when deriving theme colors, so every
 # value in "globals" is resolved to a literal here. This is what fixes the light chrome.
 RESOLVER='
 function resolve(v,   guard, key, name, val) {
@@ -204,9 +204,9 @@ END {
 awk -v MODE=scheme "$RESOLVER" "$UPSTREAM_SCHEME" \
     | sed "0,/\"name\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/s//\"name\": \"Monokai Plus Merge\"/" \
     > "$USER_DIR/$SCHEME_NAME"
-[ -s "$USER_DIR/$SCHEME_NAME" ] || die "failed to generate the colour scheme"
+[ -s "$USER_DIR/$SCHEME_NAME" ] || die "failed to generate the color scheme"
 
-# Pull the four resolved colours back out for the theme rules and widget palette.
+# Pull the four resolved colors back out for the theme rules and widget palette.
 # Read them rather than eval them: values like "hsl(285, 5%, 17%)" contain parentheses
 # and spaces, which eval would try to interpret as shell syntax.
 RESOLVED_VARS="$(awk -v MODE=vars "$RESOLVER" "$UPSTREAM_SCHEME")"
@@ -230,7 +230,7 @@ END {
     for (i = 1; i <= NR; i++) {
         if (i == close_at) {
             print "        // Sublime Merge draws header.layer0 and details_panel.layer0 itself, from"
-            print "        // the light companion colour scheme, ignoring every theme rule. Their"
+            print "        // the light companion color scheme, ignoring every theme rule. Their"
             print "        // linear_container_control child covers the same rect and does obey the theme."
             printf "        { \"class\": \"linear_container_control\", \"parents\": [{\"class\": \"details_panel\"}], \"layer0.tint\": \"%s\", \"layer0.opacity\": 1.0 },\n", BG
             printf "        { \"class\": \"linear_container_control\", \"parents\": [{\"class\": \"header\"}], \"layer0.tint\": \"%s\", \"layer0.opacity\": 1.0 },\n", BG
@@ -295,7 +295,7 @@ cat > "$THEME_DIR/Widget - Merge.sublime-settings" <<'EOF'
 EOF
 
 # Merge binds each view type as "<Type> - <ThemeName>.sublime-settings"; the un-suffixed
-# Diff.sublime-settings is what the theme docs name as the source of theme colours.
+# Diff.sublime-settings is what the theme docs name as the source of theme colors.
 for n in "Diff" "Diff - Merge" "File Mode - Merge" "Git Output - Merge"; do
     printf '{\n\t"color_scheme": "%s"\n}\n' "$SCHEME_NAME" > "$USER_DIR/$n.sublime-settings"
 done
@@ -305,7 +305,7 @@ for n in "Commit Message - Merge" "Commit Message (Read Only) - Merge"; do
 done
 step "bound 6 view types plus the widget palette"
 
-# ---------------------------------------------- 6. global colour scheme preference
+# ---------------------------------------------- 6. global color scheme preference
 # An existing Preferences file is never rewritten. The per-view-type bindings above are
 # what actually carry the theme (verified by measurement: identical pixel counts with and
 # without this key), so a hands-off policy costs nothing here and cannot damage settings
