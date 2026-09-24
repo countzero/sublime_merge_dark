@@ -13,14 +13,11 @@ description: >
 This skill performs 3 iterative review passes over a pull request diff with
 escalating focus: general defects, cross-file interactions, then absent
 behavior. After all passes, a final summary deduplicates, validates, assigns
-severity, and filters to Critical/High/Medium. The output includes clickable
-deep links to the relevant code on GitHub so the developer or reviewer can
-easily navigate to each finding.
+severity, and filters to Critical/High/Medium.
 
 ### PR and Diff Resolution
 
-1. Run `gh pr view --json number,baseRefName,state,isDraft`. This single call
-   determines whether a PR exists and, if so, its state.
+1. Run `gh pr view --json number,baseRefName,state,isDraft`.
 2. **If a PR exists:**
    - If the PR is closed or a draft, inform the user and stop.
    - Otherwise, use the PR's `baseRefName` as the base for the diff.
@@ -88,9 +85,8 @@ final severity tables directly in the conversation.
 
 ### Review Passes
 
-Three passes over the full diff, each with a different focus. All passes
-review the full diff. Findings are recorded **without severity**: just File,
-Line(s), and Description.
+Three passes over the full diff, each with a different focus. Findings are
+recorded **without severity**: just File, Line(s), and Description.
 
 Only flag defects in lines that are added or modified in this PR. Do not flag
 issues in unchanged context lines, even if they appear in diff hunks.
@@ -107,25 +103,22 @@ Skip any finding that:
 Review the diff. Report all defects: bugs, logic errors, security issues, bad
 practices, missing validation, incorrect error handling. When the bash
 installer changes, check whether `tools/test-linux.sh` still exercises the
-changed behaviour; flag an untested change as a finding. Also check the
-project-specific concerns listed
-in the Project-Specific Review Checklist section below. Only flag defects in
-lines that are added or modified in this PR.
+changed behavior; flag an untested change as a finding. Also check the
+project-specific concerns listed in the Project-Specific Review Checklist
+section below.
 
 **Pass 2: What was missed**
 Review the diff again, assuming defects were missed on the first pass. Focus
 on interactions between changed files, subtle logic errors, and implicit
-assumptions in the code. Only flag defects in lines that are added or modified
-in this PR.
+assumptions in the code.
 
 **Pass 3: What the code does NOT do**
 Assume there are still undiscovered defects. Focus on what is absent: missing
 error handling, missing edge cases, missing input validation, missing null
 checks, race conditions, resource leaks, and incorrect assumptions about
-state. Only flag defects in lines that are added or modified in this PR.
+state.
 
-Track findings internally across passes (in conversation context). The format
-for each finding is: File, Line(s), Description.
+Track findings internally across passes (in conversation context).
 
 ### False Positive Exclusion List
 
@@ -208,19 +201,15 @@ After Pass 3:
    it has no defects. If all severity buckets are empty, print
    `No Critical/High/Medium findings.` in place of the severity tables.
 
-No data is written to GitHub. The developer or reviewer uses the output to
-manually create PR comments.
+The developer or reviewer uses the output to manually create PR comments.
 
 ### Link Format
-
-This section defines how links appear in the output tables. Follow these
-rules exactly.
 
 **Columns:** File, Description. The File column contains a markdown link. The
 link label is the file path relative to the repository root with a leading
 `/`, plus the line range in `:{start}-{end}` format (e.g.,
-`/install-monokai-merge.ps1:211-222`). The link URL is the full GitHub URL constructed
-as described below.
+`/install-monokai-merge.ps1:211-222`). The link URL is the full GitHub URL
+constructed as described below.
 
 **Line range:** Include 1 line of context before and after the finding. A
 finding on line 42 links to lines 41-43. A finding spanning lines 42-45
@@ -228,7 +217,7 @@ links to lines 41-46. The label always uses `:{start}-{end}` regardless of
 whether the URL uses `L` or `R` anchors.
 
 **SHA-256 hash for PR links:** Compute the SHA-256 hex digest of each unique
-file path. Prefer PowerShell (this is a Windows project):
+file path. Prefer PowerShell:
 `$hasher = [System.Security.Cryptography.SHA256]::Create(); $bytes = [System.Text.Encoding]::UTF8.GetBytes('{path}'); -join(($hasher.ComputeHash($bytes) | ForEach-Object ToString('x2')))`
 Fallback if Node.js is available:
 `node -e "process.stdout.write(require('crypto').createHash('sha256').update('{path}').digest('hex'))"`.
@@ -243,18 +232,18 @@ Note: blob links use `L` (not `R`) for line anchors.
 **Correct: markdown links with file path labels**
 
 ```markdown
-| File                                                                                                                  | Description                    |
-| --------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| [/install-monokai-merge.ps1:211-222](https://github.com/owner/repo/pull/42/files#diff-a1b2c3d4e5f6a7b8c9d0e1f2a3R41-R43) | Rewrites user Preferences unguarded  |
-| [/install-monokai-merge.ps1:211-222](https://github.com/owner/repo/blob/4a7c9e1f/install-monokai-merge.ps1#L211-L222)      | Rewrites user Preferences unguarded  |
+| File                                                                                                                       | Description                         |
+| -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| [/install-monokai-merge.ps1:211-222](https://github.com/owner/repo/pull/42/files#diff-a1b2c3d4e5f6a7b8c9d0e1f2a3R211-R222) | Rewrites user Preferences unguarded |
+| [/install-monokai-merge.ps1:211-222](https://github.com/owner/repo/blob/4a7c9e1f/install-monokai-merge.ps1#L211-L222)      | Rewrites user Preferences unguarded |
 ```
 
 **Wrong: do NOT use any of these formats**
 
 ```markdown
-| https://github.com/owner/repo/pull/42/files#diff-a1b2c3d4e5f6a7b8c9d0e1f2a3R41-R43 | ...  |
-| [https://github.com/...](https://github.com/...)                                   | ...  |
-| [install-monokai-merge.ps1:211-222](https://github.com/...)                          | ...  |
+| https://github.com/owner/repo/pull/42/files#diff-a1b2c3d4e5f6a7b8c9d0e1f2a3R211-R222 | ... |
+| [https://github.com/...](https://github.com/...)                                     | ... |
+| [install-monokai-merge.ps1:211-222](https://github.com/...)                          | ... |
 ```
 
 The first is wrong because it uses a raw URL instead of a markdown link. The
@@ -284,15 +273,15 @@ from the repository root with a leading `/`.
 
 ### Critical
 
-| File                                                                                                                  | Description                       |
-| --------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| [/install-monokai-merge.ps1:211-222](https://github.com/owner/repo/pull/42/files#diff-a1b2c3d4e5f6a7b8c9d0e1f2a3R41-R43) | Rewrites user Preferences unguarded      |
+| File                                                                                                                       | Description                         |
+| -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| [/install-monokai-merge.ps1:211-222](https://github.com/owner/repo/pull/42/files#diff-a1b2c3d4e5f6a7b8c9d0e1f2a3R211-R222) | Rewrites user Preferences unguarded |
 
 ### High
 
-| File                                                                                                                  | Description                       |
-| --------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| [/install-monokai-merge.sh:213-215](https://github.com/owner/repo/pull/42/files#diff-f6a7b8c9d0a1b2c3d4e5f6a7b8R14-R19) | eval on a parenthesised value |
+| File                                                                                                                      | Description                   |
+| ------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| [/install-monokai-merge.sh:213-215](https://github.com/owner/repo/pull/42/files#diff-f6a7b8c9d0a1b2c3d4e5f6a7b8R213-R215) | eval on a parenthesized value |
 ```
 
 **Metadata-row formatting rules:**
@@ -309,9 +298,8 @@ from the repository root with a leading `/`.
 - **Diff:** plain text. Format: `<files> files · +<additions> · −<deletions>`,
   with middle dots (` · `, U+00B7) as separators. Use the Unicode minus sign
   (U+2212, `−`) for the deletions count, not the ASCII hyphen-minus.
-- **Findings:** `🔴 <n> Critical · 🟠 <n> High · 🟡 <n> Medium`. Severity
-  glyphs replace coloured pills to keep the recipe free of custom CSS while
-  staying scannable. Always show all three severities, even when zero.
+- **Findings:** `🔴 <n> Critical · 🟠 <n> High · 🟡 <n> Medium`. Always show
+  all three severities, even when zero.
 
 ### Constraints
 
