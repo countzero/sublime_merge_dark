@@ -19,7 +19,7 @@ install-monokai-merge.ps1     Windows installer (verified end-to-end on real Mer
 install-monokai-merge.sh      Linux installer   (verified against a synthetic install)
 tools/test-linux.sh           functional test for the bash installer
 tools/probe-control-tree.ps1  ctrl+alt+click control-tree reader (see Diagnosis below)
-.claude/skills/               plan-review, pr-code-review (see Skills below)
+.claude/skills/               agent skills (see Skills below)
 ```
 
 ## The License Gate, and the Mechanism That Bypasses It
@@ -259,6 +259,39 @@ untracked files are untouchable.
 When your changes overlap foreign WIP in the same file, stop and ask. Do not
 reset, restore, or stash.
 
+## Comments and Documentation
+
+**Comments** explain why, not what. Default to none; prefer a clearer name.
+State a rationale once, where it is defined, and point to it from elsewhere.
+History lives in git, never "previously X". A comment longer than about three
+lines must record something the code cannot: a platform or engine fact, a
+measured number, or a decision that is costly to reverse. The fix block both
+installers emit is the reference example.
+
+**Documents** are held to this checklist:
+
+1. **One home.** Nothing stated twice across `AGENTS.md`, `README.md` and the
+   skills; a second mention is a pointer, `` `AGENTS.md` → *Section* ``. A
+   pointed-at heading is an interface: rename it and re-point its callers.
+2. **Nothing derivable.** No count or list the file system or code answers.
+3. **Nothing historical**, with one exemption by name: *Dead Ends: Do Not
+   Repeat*, where each entry is a cost paid again by whoever retries it.
+4. **Size.** `AGENTS.md` is loaded into every session: target about 12,000
+   bytes, limit 18,500, measured with `(Get-Item AGENTS.md).Length`.
+
+Whoever touches a paragraph also fixes its stale forms (British spelling, a
+history sentence, a second copy). The `trim-prose` skill applies all of this to
+a branch.
+
+## Pull Requests
+
+The body answers **what** changed and **why**, names the **shortcomings** of
+the approach, says **which feedback** is wanted, and lists **what is not
+done**. A change to a surface reports its pixel counts for both view states
+(*Verification Method*). A link supplements the description and never carries
+it. Keep the title free of anything that may need correcting: GitHub copies it
+into the merge commit.
+
 ## Skills
 
 Under `.claude/skills/`, loaded on demand:
@@ -268,6 +301,8 @@ Under `.claude/skills/`, loaded on demand:
 - `pr-code-review`: three-pass defect review of a diff, severity-filtered, with
   deep links. Advisory only; it never writes to GitHub. Its project-specific
   checklist is the enforcement arm of *Rules for Changes* below.
+- `trim-prose`: editing pass over the comments and documents a branch changed,
+  before its pull request. Edits the working tree; never commits.
 
 ## Rules for Changes
 
