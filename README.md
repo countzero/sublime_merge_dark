@@ -1,5 +1,7 @@
 # sublime_merge_dark
 
+[![Last commit](https://img.shields.io/github/last-commit/countzero/sublime_merge_dark)](https://github.com/countzero/sublime_merge_dark/commits/main) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![GitHub Sponsors](https://img.shields.io/github/sponsors/countzero?label=Sponsor&logo=GitHub)](https://github.com/sponsors/countzero) [![Ko-fi](https://img.shields.io/badge/Ko--fi-Tip-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/finnkumkar)
+
 Apply the **Monokai Pro** theme to **Sublime Merge**, including the three
 surfaces that ordinary theme rules cannot reach.
 
@@ -156,10 +158,16 @@ Linux.
 Theme: [bitsper2nd/merge-monokai-theme](https://github.com/bitsper2nd/merge-monokai-theme).
 The `log_control_tree` tip comes from a Sublime staff reply on forum topic 55800.
 
-## Licence
+## License & Disclaimer
 
-[MIT](LICENSE), covering the installers, the tools and the documentation in this
-repository.
+[MIT](LICENSE). Copyright (c) 2026 Finn Kumkar. Covers the installers, the tools
+and the documentation in this repository.
+
+> **Unofficial tool.** Not affiliated with, endorsed by, or sponsored by Sublime
+> HQ. "Sublime Merge" is a trademark of Sublime HQ Pty Ltd, used here
+> descriptively. The installers change only your own Sublime Merge data
+> directory, through the documented package override mechanism; they do not
+> touch the license check.
 
 Two things this repository deliberately does **not** contain:
 
@@ -170,3 +178,12 @@ Two things this repository deliberately does **not** contain:
   `Merge Dark Base.sublime-theme` are extracted from *your own* Sublime Merge
   installation when you run an installer. Nothing belonging to Sublime HQ is
   redistributed here.
+
+## Support
+
+If this saves your eyes, consider supporting future work:
+
+- [GitHub Sponsors](https://github.com/sponsors/countzero): recurring or one-time.
+- [Ko-fi](https://ko-fi.com/finnkumkar): one-time tip, no signup required.
+
+<a href="https://ko-fi.com/finnkumkar"><img src="https://storage.ko-fi.com/cdn/kofi2.png?v=6" alt="Support on Ko-fi" width="180"></a>
