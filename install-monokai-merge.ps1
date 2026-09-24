@@ -15,7 +15,8 @@
         details_panel                 -> the right-hand pane behind the diffs
         commit_dialog_summary_container -> the commit dialog pane
     For the first two, the fix is to tint their linear_container_control child, which covers
-    the same rectangle and does obey the theme.
+    the same rectangle and does obey the theme. Windowed dialogs (Update) have the same
+    problem on "dialog" and are fixed through the "window" class of the same control.
 
     Idempotent: safe to re-run. Re-run it after a Sublime Merge upgrade, because two of the
     files it writes are extracted from the installed version's own package.
@@ -155,7 +156,16 @@ $fixes = @(
     ('        {{ "class": "linear_container_control", "parents": [{{"class": "header"}}], "layer0.tint": "{0}", "layer0.opacity": 1.0 }},' -f $background),
     '        // without this the header content_margin leaves a 2px light line above and below',
     '        { "class": "header", "content_margin": 0 },',
-    ('        {{ "class": "commit_dialog_summary_container", "layer0.tint": "{0}", "layer0.opacity": 1.0 }}' -f $background)
+    ('        {{ "class": "commit_dialog_summary_container", "layer0.tint": "{0}", "layer0.opacity": 1.0 }},' -f $background),
+    '        // Windowed dialogs (Update and friends) are one control carrying two classes,',
+    '        // "dialog window". The engine hard-codes layer0 for "dialog", so rules on that',
+    '        // class are ignored; a rule on the bare "window" class does paint (the compound',
+    '        // "dialog window" selector matches nothing). The main window is not "window".',
+    '        // The root rules also resolve dialog_button_bg and progress_bg against the light',
+    '        // root variables (variables resolve per-file), so restate them here.',
+    ('        {{ "class": "window", "layer0.tint": "{0}", "layer0.opacity": 1.0 }},' -f $background),
+    '        { "class": "button_control", "parents": [{"class": "dialog"}], "layer1.tint": "var(dialog_button_bg)" },',
+    '        { "class": "progress_bar_control", "parents": [{"class": "dialog"}], "layer0.tint": "var(progress_bg)", "layer0.opacity": 1.0 }'
 )
 $lines.InsertRange($close, [string[]]$fixes)
 $themeOut = $lines -join "`n"

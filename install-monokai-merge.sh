@@ -14,7 +14,8 @@
 #     details_panel                   -> the right-hand pane behind the diffs
 #     commit_dialog_summary_container  -> the commit dialog pane
 # For the first two the fix is to tint their linear_container_control child, which covers
-# the same rectangle and does obey the theme.
+# the same rectangle and does obey the theme. Windowed dialogs (Update) have the same
+# problem on "dialog" and are fixed through the "window" class of the same control.
 #
 # Idempotent. Re-run after a Sublime Merge upgrade: two of the files it writes are
 # extracted from the installed version's own package.
@@ -235,7 +236,16 @@ END {
             printf "        { \"class\": \"linear_container_control\", \"parents\": [{\"class\": \"header\"}], \"layer0.tint\": \"%s\", \"layer0.opacity\": 1.0 },\n", BG
             print "        // without this, header content_margin leaves a 2px light line top and bottom"
             print "        { \"class\": \"header\", \"content_margin\": 0 },"
-            printf "        { \"class\": \"commit_dialog_summary_container\", \"layer0.tint\": \"%s\", \"layer0.opacity\": 1.0 }\n", BG
+            printf "        { \"class\": \"commit_dialog_summary_container\", \"layer0.tint\": \"%s\", \"layer0.opacity\": 1.0 },\n", BG
+            print "        // Windowed dialogs (Update and friends) are one control carrying two classes,"
+            print "        // \"dialog window\". The engine hard-codes layer0 for \"dialog\", so rules on that"
+            print "        // class are ignored; a rule on the bare \"window\" class does paint (the compound"
+            print "        // \"dialog window\" selector matches nothing). The main window is not \"window\"."
+            print "        // The root rules also resolve dialog_button_bg and progress_bg against the light"
+            print "        // root variables (variables resolve per-file), so restate them here."
+            printf "        { \"class\": \"window\", \"layer0.tint\": \"%s\", \"layer0.opacity\": 1.0 },\n", BG
+            print "        { \"class\": \"button_control\", \"parents\": [{\"class\": \"dialog\"}], \"layer1.tint\": \"var(dialog_button_bg)\" },"
+            print "        { \"class\": \"progress_bar_control\", \"parents\": [{\"class\": \"dialog\"}], \"layer0.tint\": \"var(progress_bg)\", \"layer0.opacity\": 1.0 }"
         }
         if (i == prev && line[i] !~ /,[[:space:]]*$/) { sub(/[[:space:]]*$/, "", line[i]); print line[i] "," }
         else print line[i]

@@ -57,8 +57,8 @@ find "$ROOT/home/.config/sublime-merge/Packages/Theme - Merge" \
     | sort | while read -r f; do printf '  %8d  %s\n' "$(stat -c%s "$f")" "${f#$ROOT/home/.config/sublime-merge/Packages/}"; done
 
 echo
-echo '=== 6. the four generated fix rules ==='
-grep -nE 'linear_container_control|commit_dialog_summary_container|"class": "header"' \
+echo '=== 6. the generated fix rules ==='
+grep -nE 'linear_container_control|commit_dialog_summary_container|"class": "header"|"class": "window"|"parents": \[\{"class": "dialog"\}\]' \
     "$ROOT/home/.config/sublime-merge/Packages/Theme - Merge/Merge.sublime-theme" \
     | sed 's/^/  /'
 
